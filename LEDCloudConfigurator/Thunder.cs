@@ -29,6 +29,14 @@ namespace LEDCloudConfigurator
         [DataMember]
         public List<ThunderFX> Script;
 
+        [DataMember]
+        public int NumberOfEvents
+        {
+            get { return Script.Count(); }
+            set { }
+        }
+
+
         public Thunder(string _filename)
         {
             this.filename = _filename;

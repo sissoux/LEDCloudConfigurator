@@ -25,7 +25,7 @@ namespace LEDCloudConfigurator
     public partial class MainWindow : Window
     {
         Thunder firsthunder = new Thunder("MEDIUM1.wav", ThunderType.Medium);
-        Thunder secondthunder = new Thunder("MEDIUM1.wav", ThunderType.Medium);
+        Thunder secondthunder = new Thunder("MEDIUM2.wav", ThunderType.Medium);
         List<Thunder> ThunderList = new List<Thunder>();
         public MainWindow()
         {
@@ -34,10 +34,20 @@ namespace LEDCloudConfigurator
             script1.Add(new ThunderFX(600, FX.BigFlash));
             script1.Add(new ThunderFX(800, FX.SingleFlash));
             script1.Add(new ThunderFX(900, FX.GroupFlash));
-            firsthunder.Script = script1;
+            firsthunder.Script = new List<ThunderFX>(script1);
             script1.Add(new ThunderFX(12000, FX.SingleFlash));
             script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script = script1;
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script = new List<ThunderFX>(script1);
             ThunderList.Add(firsthunder);
             ThunderList.Add(secondthunder);
         }
@@ -49,7 +59,7 @@ namespace LEDCloudConfigurator
             {
                 //CloudMessage tempCM = new CloudMessage(thunder);
                 MemoryStream stream = new MemoryStream();
-                DataContractSerializer serializer = new DataContractSerializer(typeof(Thunder));
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Thunder));
                 serializer.WriteObject(stream, thunder);
                 stream.Position = 0;
                 StreamReader sr = new StreamReader(stream);
