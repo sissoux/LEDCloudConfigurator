@@ -12,6 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace LEDCloudConfigurator
 {
@@ -21,10 +25,37 @@ namespace LEDCloudConfigurator
     public partial class MainWindow : Window
     {
         Thunder firsthunder = new Thunder("MEDIUM1.wav", ThunderType.Medium);
-        List<Thunder> ThunderList;
+        Thunder secondthunder = new Thunder("MEDIUM1.wav", ThunderType.Medium);
+        List<Thunder> ThunderList = new List<Thunder>();
         public MainWindow()
         {
             InitializeComponent();
+            List<ThunderFX> script1 = new List<ThunderFX>();
+            script1.Add(new ThunderFX(600, FX.BigFlash));
+            script1.Add(new ThunderFX(800, FX.SingleFlash));
+            script1.Add(new ThunderFX(900, FX.GroupFlash));
+            firsthunder.Script = script1;
+            script1.Add(new ThunderFX(12000, FX.SingleFlash));
+            script1.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script = script1;
+            ThunderList.Add(firsthunder);
+            ThunderList.Add(secondthunder);
+        }
+
+        private void actionbtn_Click(object sender, RoutedEventArgs e)
+        {
+            string buffer = "";
+            foreach (Thunder thunder in ThunderList)
+            {
+                //CloudMessage tempCM = new CloudMessage(thunder);
+                MemoryStream stream = new MemoryStream();
+                DataContractSerializer serializer = new DataContractSerializer(typeof(Thunder));
+                serializer.WriteObject(stream, thunder);
+                stream.Position = 0;
+                StreamReader sr = new StreamReader(stream);
+                buffer += sr.ReadToEnd() + '\n' + '\n';
+            }
+            outputbox.Text = buffer;
         }
     }
 }

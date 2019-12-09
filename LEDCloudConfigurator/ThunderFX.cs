@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace LEDCloudConfigurator
 {
@@ -14,11 +15,16 @@ namespace LEDCloudConfigurator
         GroupFlash,
         MegaFlash
     };
+
+    [DataContract(Namespace = "")]
     public class ThunderFX
     {
-        public 
-        UInt32 timestamp = 0;
-        FX fX = FX.SingleFlash;
+        [DataMember]
+        public UInt32 timestamp = 0;
+
+        [DataMember]
+        public FX fX = FX.SingleFlash;
+
         public ThunderFX(UInt32 _timestamp, FX _fX)
         {
             this.fX = _fX;
