@@ -16,6 +16,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using Newtonsoft.Json;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace LEDCloudConfigurator
 {
@@ -24,16 +25,27 @@ namespace LEDCloudConfigurator
     /// </summary>
     public partial class MainWindow : Window
     {
-        Thunder firsthunder = new Thunder("MEDIUM1.wav", ThunderType.Medium);
-        Thunder secondthunder = new Thunder("MEDIUM2.wav", ThunderType.Medium);
-        List<Thunder> ThunderList = new List<Thunder>();
+        public Thunder firsthunder = new Thunder("MEDIUM1.wav", ThunderType.Medium);
+        public Thunder secondthunder = new Thunder("MEDIUM2.wav", ThunderType.Medium);
+        public List<Thunder> ThunderList = new List<Thunder>();
         public MyColor CurrentColor = new MyColor();
+        public ObservableCollection<Thunder> Thunders;
+        public List<MyColor> Colorlist = new List<MyColor>();
+        public ObservableCollection<MyColor> Colors;
+
 
         public MainWindow()
         {
             InitializeComponent();
             this.DataContext = this;
             ColorManagement.DataContext = CurrentColor;
+            datagrid.DataContext = Colorlist;
+            Colorlist.Add(new MyColor());
+            Colorlist.Add(new MyColor());
+            Colorlist.Add(new MyColor());
+            Colors = new ObservableCollection<MyColor>(Colorlist);
+
+
             List<ThunderFX> script1 = new List<ThunderFX>();
             script1.Add(new ThunderFX(600, FX.BigFlash));
             script1.Add(new ThunderFX(800, FX.SingleFlash));
@@ -52,8 +64,7 @@ namespace LEDCloudConfigurator
             script1.Add(new ThunderFX(1500, FX.GroupFlash));
             script1.Add(new ThunderFX(1500, FX.GroupFlash));
             secondthunder.Script = new List<ThunderFX>(script1);
-            ThunderList.Add(firsthunder);
-            ThunderList.Add(secondthunder);
+            Thunders = new ObservableCollection<Thunder>(ThunderList);
         }
 
         private void actionbtn_Click(object sender, RoutedEventArgs e)
@@ -70,7 +81,18 @@ namespace LEDCloudConfigurator
                 buffer += sr.ReadToEnd() + '\n';
             }
             File.WriteAllText(@"./output.txt", buffer);
-            outputbox.Text = File.ReadAllText(@"./output.txt");
+            //outputbox.Text = File.ReadAllText(@"./output.txt");
+        }
+
+        private void remoteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Button Sndr = sender as Button;
+            if (Sndr.CommandParameter == null) return;
+            string parameter = Sndr.CommandParameter.ToString();
+            if (parameter.Contains("IR"))
+            {
+                int ButtonID = int.Parse(parameter.Substring(2));
+            }
         }
 
         private void SliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

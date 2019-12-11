@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LEDCloudConfigurator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" Background="#FF3A3A3A"
+        x:Name="LEDClouConf">
     <Window.Resources>
         <Style x:Key="MyFocusVisual">
             <Setter Property="Control.Template">
@@ -97,7 +98,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
-            <ColumnDefinition Width="64"/>
+            <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions >
@@ -105,53 +106,55 @@
             <RowDefinition />
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
-        <TextBox x:Name="outputbox" HorizontalAlignment="Left"  TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="66" Width="772" Grid.ColumnSpan="2" Margin="0,150,0,0" Grid.Row="1"/>
-        <StackPanel Orientation="Vertical" Grid.Row="1" >
-            <StackPanel Orientation="Horizontal">
-                <Button x:Name="R" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Red" Content="R" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button x:Name="G" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Green" Content="G" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button x:Name="B" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Blue" Content="B" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button x:Name="actionbtn" Style="{StaticResource CircleButton}" Grid.Row="1" Background="White" Content="W" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="OrangeRed" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightGreen" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Pink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Orange" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Cyan" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Purple" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Pink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="PeachPuff" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="CadetBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="MediumOrchid" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="PaleTurquoise" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="DarkCyan" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="HotPink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightSkyBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
-            </StackPanel>
-        </StackPanel>
         <Border x:Name="ColorManagement" Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1">
-            <StackPanel Orientation="Vertical">
-                <Border x:Name="ColorViewer" BorderBrush="Black" BorderThickness="1" Background="Red" Height="50" Width="50" Margin="5"/>
-                <StackPanel Orientation="Horizontal" >
-                    <Slider x:Name="HSlider" HorizontalAlignment="Left" VerticalAlignment="Top" Width="20" Orientation="Vertical" Height="200" ValueChanged="SliderValueChanged" Minimum="0" Maximum="360" />
-                    <Slider x:Name="SSlider" HorizontalAlignment="Left" VerticalAlignment="Top" Width="20" Orientation="Vertical" Height="200" ValueChanged="SliderValueChanged" Minimum="0" Maximum="1" Value="1" />
-                    <Slider x:Name="VSlider" HorizontalAlignment="Left" VerticalAlignment="Top" Width="20" Orientation="Vertical" Height="200" ValueChanged="SliderValueChanged" Minimum="0" Maximum="1" Value="1" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel Orientation="Vertical" Width="120" Margin="5,5">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button CommandParameter="IR1" x:Name="R" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Red" Content="R" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR2" x:Name="G" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Green" Content="G" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR3" x:Name="B" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Blue" Content="B" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR4" x:Name="actionbtn" Style="{StaticResource CircleButton}" Grid.Row="1" Background="White" Content="W" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button CommandParameter="IR5" Style="{StaticResource CircleButton}" Grid.Row="1" Background="OrangeRed" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR6" Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightGreen" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR7" Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR8" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Pink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button CommandParameter="IR9" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Orange" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR10" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Cyan" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR11" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Purple" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR12" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Pink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button CommandParameter="IR13" Style="{StaticResource CircleButton}" Grid.Row="1" Background="PeachPuff" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR14" Style="{StaticResource CircleButton}" Grid.Row="1" Background="CadetBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR15" Style="{StaticResource CircleButton}" Grid.Row="1" Background="MediumOrchid" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR16" Style="{StaticResource CircleButton}" Grid.Row="1" Background="PaleTurquoise" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button CommandParameter="IR17" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR18" Style="{StaticResource CircleButton}" Grid.Row="1" Background="DarkCyan" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR19" Style="{StaticResource CircleButton}" Grid.Row="1" Background="HotPink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                        <Button CommandParameter="IR20" Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightSkyBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" >
-                    <TextBlock x:Name="H_Textblock" Width="20" TextAlignment="Center" Text="1"/>
-                    <TextBlock x:Name="S_Textblock" Width="20" TextAlignment="Center" Text="1" />
-                    <TextBlock x:Name="V_Textblock" Width="20" TextAlignment="Center" Text="{Binding  Path=V }" />
+                <StackPanel Orientation="Vertical">
+                    <Label x:Name="ColorViewer" BorderBrush="Black" BorderThickness="1" Background="Red" Height="50" Width="50" Margin="5"/>
+                    <StackPanel Orientation="Horizontal" >
+                        <Slider x:Name="HSlider" HorizontalAlignment="Left" Margin="2,0" VerticalAlignment="Top" Width="20" Orientation="Vertical" Height="200" ValueChanged="SliderValueChanged" Minimum="0" Maximum="360" />
+                        <Slider x:Name="SSlider" HorizontalAlignment="Left" Margin="2,0" VerticalAlignment="Top" Width="20" Orientation="Vertical" Height="200" ValueChanged="SliderValueChanged" Minimum="0" Maximum="1" Value="1" />
+                        <Slider x:Name="VSlider" HorizontalAlignment="Left" Margin="2,0" VerticalAlignment="Top" Width="20" Orientation="Vertical" Height="200" ValueChanged="SliderValueChanged" Minimum="0" Maximum="1" Value="1" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" >
+                        <TextBlock x:Name="H_Textblock" Width="24" TextAlignment="Center" Text="{Binding  Path=H }" />
+                        <TextBlock x:Name="S_Textblock" Width="24" TextAlignment="Center" Text="{Binding  Path=S }" />
+                        <TextBlock x:Name="V_Textblock" Width="24" TextAlignment="Center" Text="{Binding  Path=V }" />
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </Border>
+        <DataGrid x:Name="datagrid" HorizontalAlignment="Left" Height="289" Margin="10,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="542" ItemsSource="{Binding Colors}" />
     </Grid>
 </Window>
