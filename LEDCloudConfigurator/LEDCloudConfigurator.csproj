@@ -60,6 +60,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CloudMessage.cs" />
+    <Compile Include="MyColor.cs" />
     <Compile Include="Thunder.cs" />
     <Compile Include="ThunderFX.cs" />
     <Page Include="MainWindow.xaml">

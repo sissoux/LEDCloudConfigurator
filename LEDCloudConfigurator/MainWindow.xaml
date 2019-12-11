@@ -6,8 +6,152 @@
         xmlns:local="clr-namespace:LEDCloudConfigurator"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="MyFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Control}">
+                        <Grid Margin="8">
+                            <Ellipse
+                    Name="r1"
+                    Stroke="Black"
+                    StrokeDashArray="2 2"
+                    StrokeThickness="1"/>
+                            <Border
+                    Name="border"
+                    Width="{TemplateBinding ActualWidth}"
+                    Height="{TemplateBinding ActualHeight}"
+                    BorderThickness="1"
+                    CornerRadius="2"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CircleButton" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource MyFocusVisual}"/>
+            <Setter Property="Background" Value="#FF6DB4EF"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Ellipse Fill="{TemplateBinding Background}"/>
+                            <Ellipse x:Name="OuterCircle">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush >
+                                        <GradientStop Offset="0" Color="#00000000"/>
+                                        <GradientStop Offset="0.60" Color="#00000000"/>
+                                        <GradientStop Offset="1" Color="#60000000"/>
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <Ellipse Margin="10" x:Name="highlightCircle" >
+                                <Ellipse.Fill >
+                                    <LinearGradientBrush >
+                                        <GradientStop Offset="0" Color="#50FFFFFF"/>
+                                        <GradientStop Offset="0.5" Color="#00FFFFFF"/>
+                                        <GradientStop Offset="1" Color="#50FFFFFF"/>
+                                    </LinearGradientBrush>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <ContentPresenter x:Name="content" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="OuterCircle" Property="Fill">
+                                    <Setter.Value>
+                                        <RadialGradientBrush >
+                                            <GradientStop Offset="0" Color="#30FFFFFF"/>
+                                            <GradientStop Offset="0.60" Color="#00000000"/>
+                                            <GradientStop Offset="1" Color="#60000000"/>
+                                        </RadialGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="OuterCircle" Property="Fill">
+                                    <Setter.Value>
+                                        <RadialGradientBrush >
+                                            <GradientStop Offset="0" Color="#30FFFFFF"/>
+                                            <GradientStop Offset="0.60" Color="#00000000"/>
+                                            <GradientStop Offset="0.95" Color="#50FFFFFF"/>
+                                            <GradientStop Offset="1" Color="#60000000"/>
+                                        </RadialGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="content" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <TranslateTransform Y="0.5" X="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <TextBox x:Name="outputbox" HorizontalAlignment="Left" Margin="10,30,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="379" Width="772"/>
-        <Button x:Name="actionbtn" Content="Button" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="actionbtn_Click"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="64"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions >
+            <RowDefinition Height="10" />
+            <RowDefinition />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        <TextBox x:Name="outputbox" HorizontalAlignment="Left"  TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="66" Width="772" Grid.ColumnSpan="2" Margin="0,150,0,0" Grid.Row="1"/>
+        <StackPanel Orientation="Vertical" Grid.Row="1" >
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="R" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Red" Content="R" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button x:Name="G" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Green" Content="G" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button x:Name="B" Style="{StaticResource CircleButton}" Grid.Row="1" Background="Blue" Content="B" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button x:Name="actionbtn" Style="{StaticResource CircleButton}" Grid.Row="1" Background="White" Content="W" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="OrangeRed" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightGreen" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Pink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Orange" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Cyan" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Purple" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Pink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="PeachPuff" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="CadetBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="MediumOrchid" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="PaleTurquoise" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="DarkCyan" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="HotPink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+                <Button  Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightSkyBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="actionbtn_Click"/>
+            </StackPanel>
+        </StackPanel>
+        <Border x:Name="ColorManagement" Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+            <StackPanel Orientation="Vertical">
+                <Border x:Name="ColorViewer" BorderBrush="Black" BorderThickness="1" Background="Red" Height="50" Width="50" Margin="5"/>
+                <StackPanel Orientation="Horizontal" >
+                    <Slider x:Name="HSlider" HorizontalAlignment="Left" VerticalAlignment="Top" Width="20" Orientation="Vertical" Height="200" ValueChanged="SliderValueChanged" Minimum="0" Maximum="360" />
+                    <Slider x:Name="SSlider" HorizontalAlignment="Left" VerticalAlignment="Top" Width="20" Orientation="Vertical" Height="200" ValueChanged="SliderValueChanged" Minimum="0" Maximum="1" Value="1" />
+                    <Slider x:Name="VSlider" HorizontalAlignment="Left" VerticalAlignment="Top" Width="20" Orientation="Vertical" Height="200" ValueChanged="SliderValueChanged" Minimum="0" Maximum="1" Value="1" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" >
+                    <TextBlock x:Name="H_Textblock" Width="20" TextAlignment="Center" Text="1"/>
+                    <TextBlock x:Name="S_Textblock" Width="20" TextAlignment="Center" Text="1" />
+                    <TextBlock x:Name="V_Textblock" Width="20" TextAlignment="Center" Text="{Binding  Path=V }" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

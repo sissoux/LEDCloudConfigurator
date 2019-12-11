@@ -27,9 +27,13 @@ namespace LEDCloudConfigurator
         Thunder firsthunder = new Thunder("MEDIUM1.wav", ThunderType.Medium);
         Thunder secondthunder = new Thunder("MEDIUM2.wav", ThunderType.Medium);
         List<Thunder> ThunderList = new List<Thunder>();
+        public MyColor CurrentColor = new MyColor();
+
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = this;
+            ColorManagement.DataContext = CurrentColor;
             List<ThunderFX> script1 = new List<ThunderFX>();
             script1.Add(new ThunderFX(600, FX.BigFlash));
             script1.Add(new ThunderFX(800, FX.SingleFlash));
@@ -63,9 +67,30 @@ namespace LEDCloudConfigurator
                 serializer.WriteObject(stream, thunder);
                 stream.Position = 0;
                 StreamReader sr = new StreamReader(stream);
-                buffer += sr.ReadToEnd() + '\n' + '\n';
+                buffer += sr.ReadToEnd() + '\n';
             }
-            outputbox.Text = buffer;
+            File.WriteAllText(@"./output.txt", buffer);
+            outputbox.Text = File.ReadAllText(@"./output.txt");
+        }
+
+        private void SliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            switch (((Slider)sender).Name)
+            {
+                case "HSlider":
+                    CurrentColor.H = (float)HSlider.Value;
+                    break;
+                case "SSlider":
+                    CurrentColor.S = (float)SSlider.Value;
+                    break;
+                case "VSlider":
+                    CurrentColor.V = (float)VSlider.Value;
+                    break;
+
+                default:
+                    break;
+            }
+            ColorViewer.Background = new SolidColorBrush(Color.FromRgb(CurrentColor.r, CurrentColor.g, CurrentColor.b));
         }
     }
 }
