@@ -66,6 +66,8 @@ namespace LEDCloudConfigurator
             secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
             secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
 
+            StatusViewer.Text = "Connect to target and select an available Thunder file to begin, or import a new Thunder file.";
+
             //datagrid.ItemsSource = Thunders;
 
 
@@ -132,6 +134,18 @@ namespace LEDCloudConfigurator
                 datagrid.ItemsSource = (Item as Thunder).Script;
             }
             return;
+        }
+
+        private void AddEvent_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                (ThunderComboBox.SelectedItem as Thunder).Script.Add(new ThunderFX());
+            }
+            catch (Exception ex)
+            {
+                StatusViewer.Text= ex.Message;
+            }
         }
     }
 

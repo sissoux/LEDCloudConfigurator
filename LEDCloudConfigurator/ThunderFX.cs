@@ -48,6 +48,10 @@ namespace LEDCloudConfigurator
 
 
 
+        public ThunderFX()
+        {
+        }
+
         public ThunderFX(UInt32 _timestamp, FX _fX)
         {
             this.fX = _fX;

@@ -61,6 +61,9 @@
     </ApplicationDefinition>
     <Compile Include="CloudMessage.cs" />
     <Compile Include="MyColor.cs" />
+    <Compile Include="SerialConnector.xaml.cs">
+      <DependentUpon>SerialConnector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Thunder.cs" />
     <Compile Include="ThunderFX.cs" />
     <Page Include="MainWindow.xaml">
@@ -75,6 +78,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SerialConnector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -102,6 +113,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="sun-and-storm_icon-icons.com_54240.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
