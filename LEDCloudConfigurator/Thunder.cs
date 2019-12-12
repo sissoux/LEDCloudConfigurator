@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -24,13 +25,27 @@ namespace LEDCloudConfigurator
         public event PropertyChangedEventHandler PropertyChanged;
         public const int THUNDER_MAX_NUMBER_OF_EVENTS = 30;
         [DataMember]
-        public string filename;
+        private string filename;
+
+        public string Filename
+        {
+            get { return filename; }
+            set { filename = value; NotifyPropertyChanged(); }
+        }
+
+
+        private ThunderType type;
+        [DataMember]
+        public ThunderType Type
+        {
+            get { return type; }
+            set { type = value; NotifyPropertyChanged(); }
+        }
+
 
         [DataMember]
-        public ThunderType type = ThunderType.Distant;
+        public ObservableCollection<ThunderFX> Script { get; set; }
 
-        [DataMember]
-        public List<ThunderFX> Script;
 
         [DataMember]
         public int NumberOfEvents
@@ -42,14 +57,14 @@ namespace LEDCloudConfigurator
 
         public Thunder(string _filename)
         {
-            this.filename = _filename; 
-            NotifyPropertyChanged();
+            this.Filename = _filename;
+            Script = new ObservableCollection<ThunderFX>();
         }
         public Thunder(string _filename, ThunderType _type)
         {
             this.filename = _filename;
-            this.type = _type;
-            NotifyPropertyChanged();
+            this.Type = _type;
+            Script = new ObservableCollection<ThunderFX>();
         }
 
         // This method is called by the Set accessor of each property.

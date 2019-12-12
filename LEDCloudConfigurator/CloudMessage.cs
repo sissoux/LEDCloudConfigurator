@@ -25,8 +25,8 @@ namespace LEDCloudConfigurator
         }
         public CloudMessage(Thunder ThunderToSend)
         {
-            this.filename = ThunderToSend.filename;
-            this.type = ThunderToSend.type;
+            this.filename = ThunderToSend.Filename;
+            this.type = ThunderToSend.Type;
             foreach (ThunderFX thunderFX in ThunderToSend.Script)
             {
                 this.Script.Add(new EventList(thunderFX));

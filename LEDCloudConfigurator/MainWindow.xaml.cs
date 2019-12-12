@@ -17,6 +17,8 @@ using System.Runtime.Serialization.Json;
 using Newtonsoft.Json;
 using System.IO;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Diagnostics;
 
 namespace LEDCloudConfigurator
 {
@@ -27,11 +29,9 @@ namespace LEDCloudConfigurator
     {
         public Thunder firsthunder = new Thunder("MEDIUM1.wav", ThunderType.Medium);
         public Thunder secondthunder = new Thunder("MEDIUM2.wav", ThunderType.Medium);
-        public List<Thunder> ThunderList = new List<Thunder>();
+        //public List<Thunder> ThunderList = new List<Thunder>();
         public MyColor CurrentColor = new MyColor();
-        public ObservableCollection<Thunder> Thunders;
-        public List<MyColor> Colorlist = new List<MyColor>();
-        public ObservableCollection<MyColor> Colors;
+        public ObservableCollection<Thunder> Thunders { get; set; }
 
 
         public MainWindow()
@@ -39,38 +39,43 @@ namespace LEDCloudConfigurator
             InitializeComponent();
             this.DataContext = this;
             ColorManagement.DataContext = CurrentColor;
-            datagrid.DataContext = Colorlist;
-            Colorlist.Add(new MyColor());
-            Colorlist.Add(new MyColor());
-            Colorlist.Add(new MyColor());
-            Colors = new ObservableCollection<MyColor>(Colorlist);
+            /*Binding colorBind = new Binding("Brush");
+            colorBind.Source = CurrentColor;
+            ColorViewer.SetBinding(Label.BackgroundProperty, colorBind);
+            */
+            datagrid.DataContext = Thunders;
+            ThunderComboBox.DataContext = this;
+
+            Thunders = new ObservableCollection<Thunder>();
+            Thunders.Add(firsthunder);
+            Thunders.Add(secondthunder);
+
+            firsthunder.Script.Add(new ThunderFX(600, FX.BigFlash));
+            firsthunder.Script.Add(new ThunderFX(800, FX.SingleFlash));
+            firsthunder.Script.Add(new ThunderFX(900, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(12000, FX.SingleFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
+
+            //datagrid.ItemsSource = Thunders;
 
 
-            List<ThunderFX> script1 = new List<ThunderFX>();
-            script1.Add(new ThunderFX(600, FX.BigFlash));
-            script1.Add(new ThunderFX(800, FX.SingleFlash));
-            script1.Add(new ThunderFX(900, FX.GroupFlash));
-            firsthunder.Script = new List<ThunderFX>(script1);
-            script1.Add(new ThunderFX(12000, FX.SingleFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            script1.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script = new List<ThunderFX>(script1);
-            Thunders = new ObservableCollection<Thunder>(ThunderList);
+
         }
 
         private void actionbtn_Click(object sender, RoutedEventArgs e)
         {
             string buffer = "";
-            foreach (Thunder thunder in ThunderList)
+            foreach (Thunder thunder in Thunders)
             {
                 //CloudMessage tempCM = new CloudMessage(thunder);
                 MemoryStream stream = new MemoryStream();
@@ -112,7 +117,58 @@ namespace LEDCloudConfigurator
                 default:
                     break;
             }
-            ColorViewer.Background = new SolidColorBrush(Color.FromRgb(CurrentColor.r, CurrentColor.g, CurrentColor.b));
+        }
+
+        private void NewThunderSelected(object sender, SelectionChangedEventArgs e)
+        {
+            object Item = ((ComboBox)sender).SelectedItem;
+            if (Item == null)
+            {
+                return;
+            }
+
+            if (Item is Thunder)
+            {
+                datagrid.ItemsSource = (Item as Thunder).Script;
+            }
+            return;
+        }
+    }
+
+    public class SliderConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            switch (parameter.ToString())
+            {
+                case "H":
+                    return Math.Round((float)value, 0).ToString()+"°";
+                case "SV":
+                    return Math.Round((float)value*100, 1).ToString() + "%";
+
+                default:
+                    return value.ToString();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BindingDebugger : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Debugger.Break();
+            throw new NotImplementedException();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Debugger.Break();
+            throw new NotImplementedException();
         }
     }
 }

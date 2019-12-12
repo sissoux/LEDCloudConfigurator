@@ -17,6 +17,17 @@ namespace LEDCloudConfigurator
         private float v = 1;
         public byte r = 0, g = 0, b = 0;
 
+        private SolidColorBrush brush;
+
+        public SolidColorBrush Brush
+        {
+            get { return brush; }
+            set { 
+                brush = value; 
+                NotifyPropertyChanged("Brush"); 
+            }
+        }
+
 
 
         public float H
@@ -26,7 +37,7 @@ namespace LEDCloudConfigurator
             {
                 h = value;
                 toRGB();
-                NotifyPropertyChanged();
+                NotifyPropertyChanged("H");
             }
         }
         public float S
@@ -36,7 +47,7 @@ namespace LEDCloudConfigurator
             {
                 s = value;
                 toRGB();
-                NotifyPropertyChanged();
+                NotifyPropertyChanged("S");
             }
         }
         public float V
@@ -46,7 +57,7 @@ namespace LEDCloudConfigurator
             {
                 v = value;
                 toRGB();
-                NotifyPropertyChanged();
+                NotifyPropertyChanged("V");
             }
         }
 
@@ -70,6 +81,7 @@ namespace LEDCloudConfigurator
             r = Component(5);
             g = Component(3);
             b = Component(1);
+            Brush = new SolidColorBrush(Color.FromRgb(this.r, this.g, this.b));
         }
 
         // This method is called by the Set accessor of each property.
