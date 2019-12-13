@@ -110,8 +110,9 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" >
             <local:SerialConnector Margin="5" />
+            <Rectangle x:Name="FLASHER" Height="50" Width="50" Fill="White" Opacity="0"/>
         </StackPanel>
-        <TextBlock x:Name="StatusViewer" Margin="10" Height="20" Foreground="White" Grid.Row="3" Grid.ColumnSpan="2" />
+        <TextBlock x:Name="StatusViewer" Margin="10" Height="20" Foreground="White" Grid.Row="3" Grid.ColumnSpan="2" TextWrapping="Wrap" />
         <Border x:Name="ColorManagement" Grid.Column="1" Grid.Row="1" BorderBrush="LightGray" BorderThickness="4">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <StackPanel Orientation="Vertical" Width="120" Margin="5,5">
@@ -176,14 +177,19 @@
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Vertical" Margin="5">
                 <ComboBox x:Name="ThunderComboBox" ItemsSource="{Binding Thunders}" DisplayMemberPath="Filename"  HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Top" Width="160" SelectionChanged="NewThunderSelected" Height="25"/>
-                <Border x:Name="DataGridBorder"  Margin="5,5,0,5" Width="250" Height="300" >
+                <Border x:Name="DataGridBorder"  Margin="5,5,0,5" Width="250" Height="290" >
                     <DataGrid x:Name="datagrid" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="{Binding ElementName=DataGridBorder, Path=ActualHeight}" Width="{Binding ElementName=DataGridBorder, Path=ActualWidth}" />
                 </Border>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Play" HorizontalAlignment="Center" Margin="5,2" Width="50"  Grid.Row="2" VerticalAlignment="Top" Height="25" Click="PlayWav_Click"/>
+                    <Button Content="Stop" HorizontalAlignment="Center" Margin="5,2" Width="50"  Grid.Row="2" VerticalAlignment="Top" Height="25" Click="StopWav_Click"/>
+                </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Vertical" Margin="5">
-                <Button Content="Import JSON" HorizontalAlignment="Center" Margin="5,50,5,20" Width="130"  Grid.Row="2" VerticalAlignment="Top" Height="30"/>
-                <Button Content="New thunder from file" HorizontalAlignment="Center" Margin="5,5,5,20" Width="130"  Grid.Row="2" VerticalAlignment="Top" Height="30"/>
+                <Button Content="Import JSON" HorizontalAlignment="Center" Margin="5,50,5,20" Width="130"  Grid.Row="2" VerticalAlignment="Top" Height="30" Click="OpenFile"/>
+                <Button Content="New thunder from file" HorizontalAlignment="Center" Margin="5,5,5,20" Width="130"  Grid.Row="2" VerticalAlignment="Top" Height="30" Click="AddThunderFromFile_Click"/>
                 <Button Content="Add event" HorizontalAlignment="Center" Margin="5,5,5,20" Width="130"  Grid.Row="2" VerticalAlignment="Top" Height="30" Click="AddEvent_Click"/>
+                <Button Content="Export JSON" HorizontalAlignment="Center" Margin="5,5,5,20" Width="130"  Grid.Row="2" VerticalAlignment="Top" Height="30" Click="actionbtn_Click"/>
 
             </StackPanel>
 

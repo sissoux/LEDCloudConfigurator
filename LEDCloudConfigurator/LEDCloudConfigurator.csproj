@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="Thunder.cs" />
     <Compile Include="ThunderFX.cs" />
+    <Compile Include="WAVParser.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

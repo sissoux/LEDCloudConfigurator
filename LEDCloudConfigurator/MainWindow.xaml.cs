@@ -19,6 +19,10 @@ using System.IO;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Diagnostics;
+using Microsoft.Win32;
+using System.Media;
+using System.ComponentModel;
+using System.Windows.Media.Animation;
 
 namespace LEDCloudConfigurator
 {
@@ -32,61 +36,55 @@ namespace LEDCloudConfigurator
         //public List<Thunder> ThunderList = new List<Thunder>();
         public MyColor CurrentColor = new MyColor();
         public ObservableCollection<Thunder> Thunders { get; set; }
-
+        private SoundPlayer soundPlayer = new SoundPlayer();
+        private Storyboard storyboard;
+        private DoubleAnimation myAnim = new DoubleAnimation();
 
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent(); 
+            FLASHER.Loaded += new RoutedEventHandler(flasherLoaded);
             this.DataContext = this;
             ColorManagement.DataContext = CurrentColor;
-            /*Binding colorBind = new Binding("Brush");
-            colorBind.Source = CurrentColor;
-            ColorViewer.SetBinding(Label.BackgroundProperty, colorBind);
-            */
+
             datagrid.DataContext = Thunders;
             ThunderComboBox.DataContext = this;
 
             Thunders = new ObservableCollection<Thunder>();
-            Thunders.Add(firsthunder);
-            Thunders.Add(secondthunder);
+            soundPlayer.StreamChanged += new EventHandler(player_streamChanged);
 
-            firsthunder.Script.Add(new ThunderFX(600, FX.BigFlash));
-            firsthunder.Script.Add(new ThunderFX(800, FX.SingleFlash));
-            firsthunder.Script.Add(new ThunderFX(900, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(12000, FX.SingleFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-            secondthunder.Script.Add(new ThunderFX(1500, FX.GroupFlash));
-
-            StatusViewer.Text = "Connect to target and select an available Thunder file to begin, or import a new Thunder file.";
-
-            //datagrid.ItemsSource = Thunders;
+            StatusViewer.Text = "";
+            myAnim.From = 1.0;
+            myAnim.To = 0.0;
+            myAnim.Duration = new Duration(TimeSpan.FromSeconds(1));
+            storyboard = new Storyboard();
+            storyboard.Children.Add(myAnim);
+            Storyboard.SetTargetName(myAnim, FLASHER.Name);
+            Storyboard.SetTargetProperty(myAnim, new PropertyPath(Rectangle.OpacityProperty));
 
 
 
+        }
+        private void flasherLoaded(object sender, RoutedEventArgs e)
+        {
+            //storyboard.Begin(this);
+        }
+
+        private void player_streamChanged(object sender, EventArgs e)
+        {
+            soundPlayer.LoadAsync();
         }
 
         private void actionbtn_Click(object sender, RoutedEventArgs e)
         {
             string buffer = "";
-            foreach (Thunder thunder in Thunders)
-            {
-                //CloudMessage tempCM = new CloudMessage(thunder);
-                MemoryStream stream = new MemoryStream();
-                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Thunder));
-                serializer.WriteObject(stream, thunder);
-                stream.Position = 0;
-                StreamReader sr = new StreamReader(stream);
-                buffer += sr.ReadToEnd() + '\n';
-            }
+            //CloudMessage tempCM = new CloudMessage(thunder);
+            MemoryStream stream = new MemoryStream();
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
+            serializer.WriteObject(stream, Thunders);
+            stream.Position = 0;
+            StreamReader sr = new StreamReader(stream);
+            buffer += sr.ReadToEnd() + '\n';
             File.WriteAllText(@"./output.txt", buffer);
             //outputbox.Text = File.ReadAllText(@"./output.txt");
         }
@@ -131,7 +129,9 @@ namespace LEDCloudConfigurator
 
             if (Item is Thunder)
             {
-                datagrid.ItemsSource = (Item as Thunder).Script;
+                Thunder SelectedThunder = Item as Thunder;
+                datagrid.ItemsSource = SelectedThunder.Script;
+                SelectedThunder.LoadWAV(soundPlayer);
             }
             return;
         }
@@ -144,8 +144,81 @@ namespace LEDCloudConfigurator
             }
             catch (Exception ex)
             {
-                StatusViewer.Text= ex.Message;
+                StatusViewer.Text = ex.Message;
             }
+        }
+
+        private void OpenFile(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string filename;
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "Text files (*.txt;*.json)|*.txt;*.json | All files (*.*) | *.*";
+                openFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    filename = openFileDialog.FileName;
+                    FileStream stream = new FileStream(filename, FileMode.Open);
+                    DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
+                    List<Thunder> ImportedList = serializer.ReadObject(stream) as List<Thunder>;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                StatusViewer.Text = ex.Message;
+            }
+        }
+
+        private void AddThunderFromFile_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string Wavfilename;
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "Audio wave files (*.wav)|*.wav";
+                openFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    Wavfilename = openFileDialog.FileName;
+                    FileStream stream = new FileStream(Wavfilename, FileMode.Open);
+                    WAVParser WAV = new WAVParser(stream);
+                    if (!WAV.isValidWavefile(AudioFormat.PCM, 44100, 16))
+                        throw new Exception("Invalid WAVE audio format. Must be 16 bits PCM at 44100 kHz.");
+
+                    Thunders.Add(new Thunder(System.IO.Path.GetFileName(Wavfilename), Wavfilename));
+                    stream.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusViewer.Text = ex.Message;
+                myAnim.Completed += MyAnim_Completed;
+            }
+        }
+
+        private void MyAnim_Completed(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlayWav_Click(object sender, RoutedEventArgs e)
+        {
+            if (soundPlayer == null)
+            {
+                StatusViewer.Text = "Load WavFile first";
+                return;
+            }
+            if (soundPlayer.IsLoadCompleted) soundPlayer.Play();
+            storyboard.Begin(this);
+        }
+
+        private void StopWav_Click(object sender, RoutedEventArgs e)
+        {
+            if (soundPlayer == null)
+                return;
+            if (soundPlayer.IsLoadCompleted) soundPlayer.Stop();
         }
     }
 
@@ -156,9 +229,9 @@ namespace LEDCloudConfigurator
             switch (parameter.ToString())
             {
                 case "H":
-                    return Math.Round((float)value, 0).ToString()+"°";
+                    return Math.Round((float)value, 0).ToString() + "°";
                 case "SV":
-                    return Math.Round((float)value*100, 1).ToString() + "%";
+                    return Math.Round((float)value * 100, 1).ToString() + "%";
 
                 default:
                     return value.ToString();
