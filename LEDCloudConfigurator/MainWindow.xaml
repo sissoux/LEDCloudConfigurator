@@ -9,7 +9,6 @@
         x:Name="LEDClouConf" ResizeMode="CanMinimize" Icon="sun-and-storm_icon-icons.com_54240.png">
     <Window.Resources>
         <local:SliderConverter x:Key="SliderConverter" />
-        <local:BindingDebugger x:Key="debugger" />
         <Style x:Key="MyFocusVisual">
             <Setter Property="Control.Template">
                 <Setter.Value>
@@ -109,8 +108,7 @@
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" >
-            <local:SerialConnector Margin="5" />
-            <Rectangle x:Name="FLASHER" Height="50" Width="50" Fill="White" Opacity="0"/>
+            <local:SerialConnector x:Name="SerialPort" Margin="5" />
         </StackPanel>
         <TextBlock x:Name="StatusViewer" Margin="10" Height="20" Foreground="White" Grid.Row="3" Grid.ColumnSpan="2" TextWrapping="Wrap" />
         <Border x:Name="ColorManagement" Grid.Column="1" Grid.Row="1" BorderBrush="LightGray" BorderThickness="4">

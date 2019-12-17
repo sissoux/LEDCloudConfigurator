@@ -31,19 +31,13 @@ namespace LEDCloudConfigurator
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Thunder firsthunder = new Thunder("MEDIUM1.wav", ThunderType.Medium);
-        public Thunder secondthunder = new Thunder("MEDIUM2.wav", ThunderType.Medium);
-        //public List<Thunder> ThunderList = new List<Thunder>();
         public MyColor CurrentColor = new MyColor();
         public ObservableCollection<Thunder> Thunders { get; set; }
         private SoundPlayer soundPlayer = new SoundPlayer();
-        private Storyboard storyboard;
-        private DoubleAnimation myAnim = new DoubleAnimation();
 
         public MainWindow()
         {
             InitializeComponent(); 
-            FLASHER.Loaded += new RoutedEventHandler(flasherLoaded);
             this.DataContext = this;
             ColorManagement.DataContext = CurrentColor;
 
@@ -54,22 +48,13 @@ namespace LEDCloudConfigurator
             soundPlayer.StreamChanged += new EventHandler(player_streamChanged);
 
             StatusViewer.Text = "";
-            myAnim.From = 1.0;
-            myAnim.To = 0.0;
-            myAnim.Duration = new Duration(TimeSpan.FromSeconds(1));
-            storyboard = new Storyboard();
-            storyboard.Children.Add(myAnim);
-            Storyboard.SetTargetName(myAnim, FLASHER.Name);
-            Storyboard.SetTargetProperty(myAnim, new PropertyPath(Rectangle.OpacityProperty));
+
+            CloudMessage msd = new CloudMessage();
+            msd.setCommand(Command.fadeToHSV);
 
 
 
         }
-        private void flasherLoaded(object sender, RoutedEventArgs e)
-        {
-            //storyboard.Begin(this);
-        }
-
         private void player_streamChanged(object sender, EventArgs e)
         {
             soundPlayer.LoadAsync();
@@ -78,7 +63,6 @@ namespace LEDCloudConfigurator
         private void actionbtn_Click(object sender, RoutedEventArgs e)
         {
             string buffer = "";
-            //CloudMessage tempCM = new CloudMessage(thunder);
             MemoryStream stream = new MemoryStream();
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
             serializer.WriteObject(stream, Thunders);
@@ -86,7 +70,6 @@ namespace LEDCloudConfigurator
             StreamReader sr = new StreamReader(stream);
             buffer += sr.ReadToEnd() + '\n';
             File.WriteAllText(@"./output.txt", buffer);
-            //outputbox.Text = File.ReadAllText(@"./output.txt");
         }
 
         private void remoteBtn_Click(object sender, RoutedEventArgs e)
@@ -194,13 +177,7 @@ namespace LEDCloudConfigurator
             catch (Exception ex)
             {
                 StatusViewer.Text = ex.Message;
-                myAnim.Completed += MyAnim_Completed;
             }
-        }
-
-        private void MyAnim_Completed(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         private void PlayWav_Click(object sender, RoutedEventArgs e)
@@ -211,7 +188,6 @@ namespace LEDCloudConfigurator
                 return;
             }
             if (soundPlayer.IsLoadCompleted) soundPlayer.Play();
-            storyboard.Begin(this);
         }
 
         private void StopWav_Click(object sender, RoutedEventArgs e)
@@ -240,21 +216,6 @@ namespace LEDCloudConfigurator
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class BindingDebugger : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            Debugger.Break();
-            throw new NotImplementedException();
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            Debugger.Break();
             throw new NotImplementedException();
         }
     }
