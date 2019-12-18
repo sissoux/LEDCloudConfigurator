@@ -18,35 +18,31 @@ namespace LEDCloudConfigurator
         BigFlash,
         GroupFlash,
         MegaFlash,
+        attributeColor,
         saveColors
     };
 
     [DataContract]
     public class CloudMessage
     {
-        [DataMember]
-        private String command;
-
-
-        [DataMember(IsRequired = false)]
-        public string filename;
+        [DataMember(IsRequired = true)]
+        private String command = null;
 
         [DataMember(IsRequired = false)]
-        public ThunderType type = ThunderType.Distant;
+        byte H;
 
         [DataMember(IsRequired = false)]
-        internal  List<EventList> Script = new List<EventList>();
+        byte S;
 
         [DataMember(IsRequired = false)]
-        UInt16 H;
+        byte V;
 
-        [DataMember(IsRequired = false)]
-        UInt16 S;
-
-        [DataMember(IsRequired = false)]
-        UInt16 V;
         [DataMember(IsRequired = false)]
         UInt16 Delay;
+
+        [DataMember(IsRequired = false)]
+        int ButtonID;
+
 
         public CloudMessage(Command cmd)
         {
@@ -68,32 +64,31 @@ namespace LEDCloudConfigurator
             }
             this.setCommand(cmd);
         }
-        public CloudMessage(Thunder ThunderToSend)
-        {
-            this.filename = ThunderToSend.Filename;
-            this.type = ThunderToSend.Type;
-            foreach (ThunderFX thunderFX in ThunderToSend.Script)
-            {
-                this.Script.Add(new EventList(thunderFX));
-            }
-        }
         public CloudMessage(MyColor ColorToSend)
         {
-            this.H = (UInt16)ColorToSend.H;
-            this.S = (UInt16)ColorToSend.S;
-            this.V = (UInt16)ColorToSend.V;
+            this.H = (byte)ColorToSend.h_b;
+            this.S = (byte)ColorToSend.s_b;
+            this.V = (byte)ColorToSend.v_b;
             this.setCommand(Command.setToHSV);
+        }
+        public CloudMessage(MyColor ColorToSend, int ButtonID)
+        {
+            this.H = (byte)ColorToSend.h_b;
+            this.S = (byte)ColorToSend.s_b;
+            this.V = (byte)ColorToSend.v_b;
+            this.ButtonID = ButtonID;
+            this.setCommand(Command.attributeColor);
         }
         public CloudMessage(MyColor ColorToSend, UInt16 fadingTime)
         {
-            this.H = (UInt16)ColorToSend.H;
-            this.S = (UInt16)ColorToSend.S;
-            this.V = (UInt16)ColorToSend.V;
+            this.H = (byte)ColorToSend.h_b;
+            this.S = (byte)ColorToSend.s_b;
+            this.V = (byte)ColorToSend.v_b;
             this.Delay = fadingTime;
             this.setCommand(Command.fadeToHSV);
         }
 
-        public void setCommand(Command command)
+        private void setCommand(Command command)
         {
             this.command = command.ToString();
         }
@@ -101,19 +96,4 @@ namespace LEDCloudConfigurator
 
     }
 
-    [DataContract]
-    internal class EventList
-    {
-        [DataMember]
-        public UInt32 timestamp = 0;
-        [DataMember]
-        public FX fX = FX.SingleFlash;
-
-        public EventList(ThunderFX thunderFX)
-        {
-
-            this.fX = thunderFX.fX;
-            this.timestamp = thunderFX.timestamp;
-        }
-    }
 }

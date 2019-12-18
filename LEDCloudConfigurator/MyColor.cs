@@ -22,12 +22,25 @@ namespace LEDCloudConfigurator
         public SolidColorBrush Brush
         {
             get { return brush; }
-            set { 
-                brush = value; 
-                NotifyPropertyChanged("Brush"); 
+            set
+            {
+                brush = value;
+                NotifyPropertyChanged("Brush");
             }
         }
 
+        public byte h_b
+        {
+            get { return (byte)(h/360.0*255.0); }
+        }
+        public byte s_b
+        {
+            get { return (byte)(s * 255.0); }
+        }
+        public byte v_b
+        {
+            get { return (byte)(v * 255.0); }
+        }
 
 
         public float H

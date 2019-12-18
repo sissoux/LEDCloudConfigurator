@@ -36,7 +36,7 @@ namespace LEDCloudConfigurator
             ((ComboBox)sender).ItemsSource = COMPortList;
         }
 
-        private void connectionChange(object sender, EventArgs e)
+        public void connectionChange(object sender, EventArgs e)
         {
             if (SelectedPort != null)
             {

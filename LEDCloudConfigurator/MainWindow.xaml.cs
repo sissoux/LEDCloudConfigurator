@@ -23,38 +23,73 @@ using Microsoft.Win32;
 using System.Media;
 using System.ComponentModel;
 using System.Windows.Media.Animation;
+using System.Threading;
 
 namespace LEDCloudConfigurator
 {
-    /// <summary>
-    /// Logique d'interaction pour MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MyColor CurrentColor = new MyColor();
         public ObservableCollection<Thunder> Thunders { get; set; }
         private SoundPlayer soundPlayer = new SoundPlayer();
+        LEDCloud myCloud;
 
         public MainWindow()
         {
-            InitializeComponent(); 
+            InitializeComponent();
+            initProperties();
+        }
+
+        private void initProperties()
+        {
+            var dueTime = TimeSpan.FromMilliseconds(100);
+            var interval = TimeSpan.FromMilliseconds(100);
+            RunPeriodicAsync(OnTick, dueTime, interval, CancellationToken.None);
+
+            myCloud = new LEDCloud(SerialPort);
             this.DataContext = this;
             ColorManagement.DataContext = CurrentColor;
-
             datagrid.DataContext = Thunders;
             ThunderComboBox.DataContext = this;
 
             Thunders = new ObservableCollection<Thunder>();
             soundPlayer.StreamChanged += new EventHandler(player_streamChanged);
-
-            StatusViewer.Text = "";
-
-            CloudMessage msd = new CloudMessage();
-            msd.setCommand(Command.fadeToHSV);
-
-
-
         }
+
+        private void OnTick()
+        {
+            if ( liveUpdateEnable.IsChecked == true)
+            {
+                try
+                {
+                    myCloud.sendCommand(new CloudMessage(CurrentColor));
+                }
+                catch (Exception ex)
+                {
+                    StatusViewer.Text = ex.Message;
+                }
+            }
+        }
+
+        // The `onTick` method will be called periodically unless cancelled.
+        private static async Task RunPeriodicAsync(Action onTick, TimeSpan dueTime, TimeSpan interval, CancellationToken token)
+        {
+            // Initial wait time before we begin the periodic loop.
+            if (dueTime > TimeSpan.Zero)
+                await Task.Delay(dueTime, token);
+
+            // Repeat this loop until cancelled.
+            while (!token.IsCancellationRequested)
+            {
+                // Call our onTick function.
+                onTick?.Invoke();
+
+                // Wait to repeat again.
+                if (interval > TimeSpan.Zero)
+                    await Task.Delay(interval, token);
+            }
+        }
+
         private void player_streamChanged(object sender, EventArgs e)
         {
             soundPlayer.LoadAsync();
@@ -77,9 +112,20 @@ namespace LEDCloudConfigurator
             Button Sndr = sender as Button;
             if (Sndr.CommandParameter == null) return;
             string parameter = Sndr.CommandParameter.ToString();
-            if (parameter.Contains("IR"))
+            try
             {
-                int ButtonID = int.Parse(parameter.Substring(2));
+                if (parameter.Contains("IR"))
+                {
+                    myCloud.sendCommand(new CloudMessage(CurrentColor, int.Parse(parameter.Substring(2))));
+                }
+                else if (parameter.Contains("Save"))
+                {
+                    myCloud.sendCommand(new CloudMessage(Command.saveColors));
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusViewer.Text = ex.Message;
             }
         }
 
@@ -146,7 +192,6 @@ namespace LEDCloudConfigurator
                     DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
                     List<Thunder> ImportedList = serializer.ReadObject(stream) as List<Thunder>;
                 }
-
             }
             catch (Exception ex)
             {
@@ -195,6 +240,46 @@ namespace LEDCloudConfigurator
             if (soundPlayer == null)
                 return;
             if (soundPlayer.IsLoadCompleted) soundPlayer.Stop();
+        }
+
+        private void ColorSendBtn(object sender, RoutedEventArgs e)
+        { 
+            try
+            {
+                myCloud.sendCommand(new CloudMessage(CurrentColor, 900));
+            }
+            catch (Exception ex)
+            {
+                StatusViewer.Text = ex.Message;
+            }
+        }
+
+        private void sendFlash_Click(object sender, RoutedEventArgs e)
+        {
+            Button Sndr = sender as Button;
+            if (Sndr.CommandParameter == null) return;
+            string parameter = Sndr.CommandParameter.ToString();
+            try
+            {
+                switch (parameter)
+                {
+                    case "single":
+                        myCloud.sendCommand(new CloudMessage(Command.SingleFlash));
+                        break;
+                    case "group":
+                        myCloud.sendCommand(new CloudMessage(Command.GroupFlash));
+                        break;
+                    case "mega":
+                        myCloud.sendCommand(new CloudMessage(Command.MegaFlash));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusViewer.Text = ex.Message;
+            }
         }
     }
 
