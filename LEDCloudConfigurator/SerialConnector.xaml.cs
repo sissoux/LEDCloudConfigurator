@@ -81,6 +81,7 @@ namespace LEDCloudConfigurator
         public SerialConnector()
         {
             InitializeComponent();
+            this.Port = new SerialPort();
         }
 
         private void PortSelected(object sender, SelectionChangedEventArgs e)

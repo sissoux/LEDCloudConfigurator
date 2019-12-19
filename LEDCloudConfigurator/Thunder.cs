@@ -82,6 +82,10 @@ namespace LEDCloudConfigurator
             if (this.filePath!=null)
             {
                 sp.Stop();
+                sp.Dispose();
+                if (sp.Stream!=null) 
+                    sp.Stream.Close();
+
                 FileStream file = new FileStream(this.filePath, FileMode.Open);
                 sp.Stream = file;
             }

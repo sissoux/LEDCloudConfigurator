@@ -23,10 +23,20 @@ namespace LEDCloudConfigurator
 
         public void sendCommand(CloudMessage message)
         {
-            if (!this.Serial.Port.IsOpen) this.Serial.connectionChange(null, null);
+            try
+            {
 
-            if (this.Serial.Port.IsOpen) this.Serial.Port.Write(serializeMessage(message));
-            else throw new Exception("Unable to connect to device.");
+                if (!this.Serial.Port.IsOpen) this.Serial.connectionChange(null, null);
+
+                if (this.Serial.Port.IsOpen) this.Serial.Port.Write(serializeMessage(message));
+                else throw new Exception("Unable to connect to device.");
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Unable to connect to device.")
+                    throw ex;
+                else throw new Exception("Undefined serial port, please select a valid COM port first.");
+            }
         }
 
         private String serializeMessage(CloudMessage message)

@@ -31,6 +31,7 @@ namespace LEDCloudConfigurator
     {
         public MyColor CurrentColor = new MyColor();
         public ObservableCollection<Thunder> Thunders { get; set; }
+        private int ThunderEventIndex = 0;
         private SoundPlayer soundPlayer = new SoundPlayer();
         LEDCloud myCloud;
 
@@ -58,7 +59,7 @@ namespace LEDCloudConfigurator
 
         private void OnTick()
         {
-            if ( liveUpdateEnable.IsChecked == true)
+            if (liveUpdateEnable.IsChecked == true)
             {
                 try
                 {
@@ -69,6 +70,51 @@ namespace LEDCloudConfigurator
                     StatusViewer.Text = ex.Message;
                 }
             }
+        }
+
+        private void ScriptEvent()
+        {
+            ThunderEventIndex++;
+            if ((ThunderComboBox.SelectedItem as Thunder).Script.Count > ThunderEventIndex)
+            {
+                var evnt = (ThunderComboBox.SelectedItem as Thunder).Script[ThunderEventIndex];
+                StatusViewer.Text = evnt.timestamp.ToString() + " " + evnt.fX.ToString();
+                TimeSpan nextEventIn = TimeSpan.FromMilliseconds(evnt.timestamp - (ThunderComboBox.SelectedItem as Thunder).Script[ThunderEventIndex - 1].timestamp);
+                ScriptTaskStep(ScriptEvent, nextEventIn, CancellationToken.None);
+                if (SerialPort.Port.IsOpen)
+                {
+                    switch (evnt.fX)
+                    {
+                        case FX.SingleFlash:
+                            myCloud.sendCommand(new CloudMessage(Command.SingleFlash));
+                            break;
+                        case FX.BigFlash:
+                            myCloud.sendCommand(new CloudMessage(Command.BigFlash));
+                            break;
+                        case FX.GroupFlash:
+                            myCloud.sendCommand(new CloudMessage(Command.GroupFlash));
+                            break;
+                        case FX.MegaFlash:
+                            myCloud.sendCommand(new CloudMessage(Command.MegaFlash));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                StatusViewer.Text = "Done";
+            }
+        }
+
+        // The `onTick` method will be called periodically unless cancelled.
+        private static async Task ScriptTaskStep(Action onTick, TimeSpan dueTime, CancellationToken token)
+        {
+            // Initial wait time before we begin the periodic loop.
+            if (dueTime > TimeSpan.Zero)
+                await Task.Delay(dueTime, token);
+            if (!token.IsCancellationRequested) onTick?.Invoke();
         }
 
         // The `onTick` method will be called periodically unless cancelled.
@@ -93,18 +139,6 @@ namespace LEDCloudConfigurator
         private void player_streamChanged(object sender, EventArgs e)
         {
             soundPlayer.LoadAsync();
-        }
-
-        private void actionbtn_Click(object sender, RoutedEventArgs e)
-        {
-            string buffer = "";
-            MemoryStream stream = new MemoryStream();
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
-            serializer.WriteObject(stream, Thunders);
-            stream.Position = 0;
-            StreamReader sr = new StreamReader(stream);
-            buffer += sr.ReadToEnd() + '\n';
-            File.WriteAllText(@"./output.txt", buffer);
         }
 
         private void remoteBtn_Click(object sender, RoutedEventArgs e)
@@ -177,25 +211,64 @@ namespace LEDCloudConfigurator
             }
         }
 
-        private void OpenFile(object sender, RoutedEventArgs e)
+        private void SaveFile_Clic(object sender, RoutedEventArgs e)
         {
+            string buffer = "";
+            MemoryStream stream = new MemoryStream();
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
+            serializer.WriteObject(stream, Thunders);
+            stream.Position = 0;
+            StreamReader sr = new StreamReader(stream);
+            buffer += sr.ReadToEnd() + '\n';
             try
             {
                 string filename;
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "Text files (*.txt;*.json)|*.txt;*.json | All files (*.*) | *.*";
-                openFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                if (openFileDialog.ShowDialog() == true)
+                SaveFileDialog saveDialog = new SaveFileDialog();
+                saveDialog.Filter = "Text files (*.txt;*.json)|*.txt;*.json";
+                saveDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory+"SD";
+                saveDialog.FileName = "Thunders.txt";
+                System.IO.Directory.CreateDirectory(saveDialog.InitialDirectory);
+                if (saveDialog.ShowDialog() == true)
                 {
-                    filename = openFileDialog.FileName;
-                    FileStream stream = new FileStream(filename, FileMode.Open);
-                    DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
-                    List<Thunder> ImportedList = serializer.ReadObject(stream) as List<Thunder>;
+                    filename = saveDialog.FileName;
+                    File.WriteAllText(filename, buffer);
                 }
             }
             catch (Exception ex)
             {
                 StatusViewer.Text = ex.Message;
+            }
+        }
+
+        private void OpenFile_Clic(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result;
+            if (Thunders.Count != 0)
+                result = MessageBox.Show("This action will overwrite current configuration. Are you sure ?", "Erase notice", MessageBoxButton.OKCancel);
+            else result = MessageBoxResult.OK;
+
+            if (result == MessageBoxResult.OK)
+            {
+                try
+                {
+                    string filename;
+                    OpenFileDialog openFileDialog = new OpenFileDialog();
+                    openFileDialog.Filter = "Text files (*.txt;*.json)|*.txt;*.json | All files (*.*) | *.*";
+                    openFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + "SD";
+                    System.IO.Directory.CreateDirectory(openFileDialog.InitialDirectory);
+                    if (openFileDialog.ShowDialog() == true)
+                    {
+                        filename = openFileDialog.FileName;
+                        FileStream stream = new FileStream(filename, FileMode.Open);
+                        DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
+                        Thunders.Clear();
+                        (serializer.ReadObject(stream) as List<Thunder>).ToList().ForEach(Thunders.Add);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    StatusViewer.Text = ex.Message;
+                }
             }
         }
 
@@ -227,12 +300,24 @@ namespace LEDCloudConfigurator
 
         private void PlayWav_Click(object sender, RoutedEventArgs e)
         {
-            if (soundPlayer == null)
+            try
             {
-                StatusViewer.Text = "Load WavFile first";
-                return;
+                if (soundPlayer == null)
+                {
+                    StatusViewer.Text = "Load WavFile first";
+                    return;
+                }
+                if (soundPlayer.IsLoadCompleted) soundPlayer.Play();
+                ThunderEventIndex = 0;
+                if ((ThunderComboBox.SelectedItem as Thunder).Script.Count != 0)
+                {
+                    ScriptTaskStep(ScriptEvent, TimeSpan.FromMilliseconds((ThunderComboBox.SelectedItem as Thunder).Script[0].timestamp), CancellationToken.None);
+                }
             }
-            if (soundPlayer.IsLoadCompleted) soundPlayer.Play();
+            catch (Exception)
+            {
+                StatusViewer.Text = "Select a Thunder first";
+            }
         }
 
         private void StopWav_Click(object sender, RoutedEventArgs e)
