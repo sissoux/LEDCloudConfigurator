@@ -24,6 +24,7 @@ using System.Media;
 using System.ComponentModel;
 using System.Windows.Media.Animation;
 using System.Threading;
+using System.IO.Ports;
 
 namespace LEDCloudConfigurator
 {
@@ -34,6 +35,7 @@ namespace LEDCloudConfigurator
         private int ThunderEventIndex = 0;
         private SoundPlayer soundPlayer = new SoundPlayer();
         LEDCloud myCloud;
+        volatile static string SerialBuffer = "";
 
         public MainWindow()
         {
@@ -43,8 +45,8 @@ namespace LEDCloudConfigurator
 
         private void initProperties()
         {
-            var dueTime = TimeSpan.FromMilliseconds(100);
-            var interval = TimeSpan.FromMilliseconds(100);
+            var dueTime = TimeSpan.FromMilliseconds(10);
+            var interval = TimeSpan.FromMilliseconds(10);
             RunPeriodicAsync(OnTick, dueTime, interval, CancellationToken.None);
 
             myCloud = new LEDCloud(SerialPort);
@@ -55,10 +57,22 @@ namespace LEDCloudConfigurator
 
             Thunders = new ObservableCollection<Thunder>();
             soundPlayer.StreamChanged += new EventHandler(player_streamChanged);
+            parseThunderFile(AppDomain.CurrentDomain.BaseDirectory + "SD\\Thunders.txt");
+            SerialPort.Port.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceivedHandler);
+        }
+
+        private static void SerialDataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort sp = sender as SerialPort;
+            while (sp.BytesToRead > 0)
+            {
+                SerialBuffer += sp.ReadLine();
+            }
         }
 
         private void OnTick()
         {
+            SerialViewer.Text = SerialBuffer;
             if (liveUpdateEnable.IsChecked == true)
             {
                 try
@@ -74,13 +88,9 @@ namespace LEDCloudConfigurator
 
         private void ScriptEvent()
         {
-            ThunderEventIndex++;
             if ((ThunderComboBox.SelectedItem as Thunder).Script.Count > ThunderEventIndex)
             {
                 var evnt = (ThunderComboBox.SelectedItem as Thunder).Script[ThunderEventIndex];
-                StatusViewer.Text = evnt.timestamp.ToString() + " " + evnt.fX.ToString();
-                TimeSpan nextEventIn = TimeSpan.FromMilliseconds(evnt.timestamp - (ThunderComboBox.SelectedItem as Thunder).Script[ThunderEventIndex - 1].timestamp);
-                ScriptTaskStep(ScriptEvent, nextEventIn, CancellationToken.None);
                 if (SerialPort.Port.IsOpen)
                 {
                     switch (evnt.fX)
@@ -101,10 +111,16 @@ namespace LEDCloudConfigurator
                             break;
                     }
                 }
-            }
-            else
-            {
-                StatusViewer.Text = "Done";
+                StatusViewer.Text = evnt.timestamp.ToString() + " " + evnt.fX.ToString();
+                ThunderEventIndex++;
+                if ((ThunderComboBox.SelectedItem as Thunder).Script.Count <= ThunderEventIndex)
+                {
+                    StatusViewer.Text = "Done";
+                    return;
+                }
+                var nextEvnt = (ThunderComboBox.SelectedItem as Thunder).Script[ThunderEventIndex];
+                TimeSpan nextEventIn = TimeSpan.FromMilliseconds(nextEvnt.timestamp - evnt.timestamp);
+                ScriptTaskStep(ScriptEvent, nextEventIn, CancellationToken.None);
             }
         }
 
@@ -203,7 +219,7 @@ namespace LEDCloudConfigurator
         {
             try
             {
-                (ThunderComboBox.SelectedItem as Thunder).Script.Add(new ThunderFX());
+                (ThunderComboBox.SelectedItem as Thunder).addEvent(new ThunderFX());
             }
             catch (Exception ex)
             {
@@ -225,7 +241,7 @@ namespace LEDCloudConfigurator
                 string filename;
                 SaveFileDialog saveDialog = new SaveFileDialog();
                 saveDialog.Filter = "Text files (*.txt;*.json)|*.txt;*.json";
-                saveDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory+"SD";
+                saveDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + "SD";
                 saveDialog.FileName = "Thunders.txt";
                 System.IO.Directory.CreateDirectory(saveDialog.InitialDirectory);
                 if (saveDialog.ShowDialog() == true)
@@ -258,11 +274,7 @@ namespace LEDCloudConfigurator
                     System.IO.Directory.CreateDirectory(openFileDialog.InitialDirectory);
                     if (openFileDialog.ShowDialog() == true)
                     {
-                        filename = openFileDialog.FileName;
-                        FileStream stream = new FileStream(filename, FileMode.Open);
-                        DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
-                        Thunders.Clear();
-                        (serializer.ReadObject(stream) as List<Thunder>).ToList().ForEach(Thunders.Add);
+                        parseThunderFile(openFileDialog.FileName);
                     }
                 }
                 catch (Exception ex)
@@ -270,6 +282,14 @@ namespace LEDCloudConfigurator
                     StatusViewer.Text = ex.Message;
                 }
             }
+        }
+
+        private void parseThunderFile(string filename)
+        {
+            FileStream stream = new FileStream(filename, FileMode.Open);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Thunder>));
+            Thunders.Clear();
+            (serializer.ReadObject(stream) as List<Thunder>).ToList().ForEach(Thunders.Add);
         }
 
         private void AddThunderFromFile_Click(object sender, RoutedEventArgs e)
@@ -328,10 +348,10 @@ namespace LEDCloudConfigurator
         }
 
         private void ColorSendBtn(object sender, RoutedEventArgs e)
-        { 
+        {
             try
             {
-                myCloud.sendCommand(new CloudMessage(CurrentColor, 900));
+                myCloud.sendCommand(new CloudMessage(CurrentColor, (UInt16)900));
             }
             catch (Exception ex)
             {
@@ -364,6 +384,19 @@ namespace LEDCloudConfigurator
             catch (Exception ex)
             {
                 StatusViewer.Text = ex.Message;
+            }
+        }
+
+        private void SerialSendBtn(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                myCloud.send(SerialSender.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
     }

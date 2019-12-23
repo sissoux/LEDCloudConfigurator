@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -27,8 +28,25 @@ namespace LEDCloudConfigurator
             {
 
                 if (!this.Serial.Port.IsOpen) this.Serial.connectionChange(null, null);
+                string msg = serializeMessage(message);
+                if (this.Serial.Port.IsOpen) this.Serial.Port.Write(msg);
+                else throw new Exception("Unable to connect to device.");
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Unable to connect to device.")
+                    throw ex;
+                else throw new Exception("Undefined serial port, please select a valid COM port first.");
+            }
+        }
+        public void send(string message)
+        {
+            try
+            {
 
-                if (this.Serial.Port.IsOpen) this.Serial.Port.Write(serializeMessage(message));
+                if (!this.Serial.Port.IsOpen) this.Serial.connectionChange(null, null);
+
+                if (this.Serial.Port.IsOpen) this.Serial.Port.Write(message);
                 else throw new Exception("Unable to connect to device.");
             }
             catch (Exception ex)

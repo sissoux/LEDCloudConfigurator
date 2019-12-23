@@ -50,6 +50,34 @@ namespace LEDCloudConfigurator
         public ObservableCollection<ThunderFX> Script { get; set; }
 
 
+        public void addEvent(ThunderFX fx)
+        {
+            if (NumberOfEvents < THUNDER_MAX_NUMBER_OF_EVENTS)
+            {
+                if (NumberOfEvents <= 1)
+                    this.Script.Add(fx);
+                else
+                {
+                    for (int i = 0; i < NumberOfEvents; i++)
+                    {
+                        if (i != NumberOfEvents)
+                        {
+                            if (fx.timestamp < this.Script[i - 1].timestamp)
+                            {
+                                this.Script.Insert(i, fx);
+                                break;
+                            }
+                            else
+                                this.Script.Add(fx);
+                        }
+                    }
+                }
+                NumberOfEvents++;
+            }
+            else throw new Exception("List of events is already full");
+        }
+
+
         [DataMember]
         public int NumberOfEvents
         {
