@@ -58,9 +58,10 @@ namespace LEDCloudConfigurator
             Thunders = new ObservableCollection<Thunder>();
             soundPlayer.StreamChanged += new EventHandler(player_streamChanged);
             parseThunderFile(AppDomain.CurrentDomain.BaseDirectory + "SD\\Thunders.txt");
-            SerialPort.Port.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceivedHandler);
-        }
+            //SerialPort.Port.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceivedHandler);
 
+        }
+        /*
         private static void SerialDataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = sender as SerialPort;
@@ -69,7 +70,7 @@ namespace LEDCloudConfigurator
                 SerialBuffer += sp.ReadLine();
             }
         }
-
+        */
         private void OnTick()
         {
             SerialViewer.Text = SerialBuffer;

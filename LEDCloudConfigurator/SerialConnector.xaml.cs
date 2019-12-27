@@ -45,6 +45,7 @@ namespace LEDCloudConfigurator
                     try
                     {
                         Port.PortName = SelectedPort;
+                        Port.BaudRate = 115200;
                         Port.Open();
                         Connect_button.Content = "Disconnect";
                         ConnectionStatusDisplay.Text = "Connected";
