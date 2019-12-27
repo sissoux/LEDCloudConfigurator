@@ -37,6 +37,8 @@ namespace LEDCloudConfigurator
         LEDCloud myCloud;
         volatile static string SerialBuffer = "";
 
+        bool AutoScroll = true;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -58,10 +60,10 @@ namespace LEDCloudConfigurator
             Thunders = new ObservableCollection<Thunder>();
             soundPlayer.StreamChanged += new EventHandler(player_streamChanged);
             parseThunderFile(AppDomain.CurrentDomain.BaseDirectory + "SD\\Thunders.txt");
-            //SerialPort.Port.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceivedHandler);
+            SerialPort.Port.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceivedHandler);
 
         }
-        /*
+        
         private static void SerialDataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = sender as SerialPort;
@@ -70,10 +72,10 @@ namespace LEDCloudConfigurator
                 SerialBuffer += sp.ReadLine();
             }
         }
-        */
+        
         private void OnTick()
         {
-            SerialViewer.Text = SerialBuffer;
+            SerialViewer.Content = SerialBuffer;
             if (liveUpdateEnable.IsChecked == true)
             {
                 try
@@ -84,6 +86,30 @@ namespace LEDCloudConfigurator
                 {
                     StatusViewer.Text = ex.Message;
                 }
+            }
+        }
+        private void ScrollViewer_ScrollChanged(Object sender, ScrollChangedEventArgs e)
+        {
+            // User scroll event : set or unset auto-scroll mode
+            if (e.ExtentHeightChange == 0)
+            {   // Content unchanged : user scroll event
+                if (SerialViewer.VerticalOffset == SerialViewer.ScrollableHeight)
+                {   // Scroll bar is in bottom
+                    // Set auto-scroll mode
+                    AutoScroll = true;
+                }
+                else
+                {   // Scroll bar isn't in bottom
+                    // Unset auto-scroll mode
+                    AutoScroll = false;
+                }
+            }
+
+            // Content scroll event : auto-scroll eventually
+            if (AutoScroll && e.ExtentHeightChange != 0)
+            {   // Content changed and auto-scroll mode set
+                // Autoscroll
+                SerialViewer.ScrollToVerticalOffset(SerialViewer.ExtentHeight);
             }
         }
 
@@ -167,7 +193,8 @@ namespace LEDCloudConfigurator
             {
                 if (parameter.Contains("IR"))
                 {
-                    myCloud.sendCommand(new CloudMessage(CurrentColor, int.Parse(parameter.Substring(2))));
+                    if (AttributeColor.IsChecked == true) myCloud.sendCommand(new CloudMessage(CurrentColor, int.Parse(parameter.Substring(2))));
+                    else myCloud.sendCommand(new CloudMessage(int.Parse(parameter.Substring(2))));
                 }
                 else if (parameter.Contains("Save"))
                 {

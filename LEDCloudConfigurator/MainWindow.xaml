@@ -105,16 +105,17 @@
         <Grid.RowDefinitions >
             <RowDefinition Height="50" />
             <RowDefinition Height="380" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="20" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" >
             <local:SerialConnector x:Name="SerialPort" Margin="5" />
         </StackPanel>
         <TextBlock x:Name="StatusViewer" Margin="10" Height="20" Foreground="White" Grid.Row="2" Grid.ColumnSpan="2" TextWrapping="Wrap" />
-        <TextBlock x:Name="SerialViewer" Margin="5" Grid.Row="3" Grid.ColumnSpan="1" TextWrapping="Wrap" Background="White" />
+        <ScrollViewer x:Name="SerialViewer" Margin="5" Grid.Row="3" Grid.ColumnSpan="1" Background="White" ScrollChanged="ScrollViewer_ScrollChanged" />
         <TextBox x:Name="SerialSender" Margin="5" VerticalAlignment="Top" Grid.Row="3" Grid.Column="1" Height="25" TextWrapping="Wrap" Background="White" />
         <Button Content="Send" HorizontalAlignment="Center" Margin="35" Width="60" Grid.Row="3" Height="25" Click="SerialSendBtn" Grid.Column="1"/>
+        
         <Border x:Name="ColorManagement" Grid.Column="1" Grid.Row="1" BorderBrush="LightGray" BorderThickness="4">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <StackPanel Orientation="Vertical" Width="120" Margin="5,5">
@@ -148,9 +149,10 @@
                         <Button CommandParameter="IR19" Style="{StaticResource CircleButton}" Grid.Row="1" Background="HotPink" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
                         <Button CommandParameter="IR20" Style="{StaticResource CircleButton}" Grid.Row="1" Background="LightSkyBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="25" Click="remoteBtn_Click"/>
                     </StackPanel>
-                    <Button Margin="10,50" CommandParameter="IR20" Click="remoteBtn_Click">
+                    <Button Margin="10,50" CommandParameter="Save" Click="remoteBtn_Click">
                         <Button.Content>Save To EEPROM</Button.Content>
                     </Button>
+                    <CheckBox Content="Attribute" Foreground="White" x:Name="AttributeColor" />
                 </StackPanel>
                 <StackPanel Orientation="Vertical">
                     <Label x:Name="ColorViewer" BorderBrush="Black" BorderThickness="1" Background="{Binding Brush}" Height="50" Width="50" Margin="5"/>

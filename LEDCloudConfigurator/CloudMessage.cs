@@ -19,6 +19,7 @@ namespace LEDCloudConfigurator
         GroupFlash,
         MegaFlash,
         attributeColor,
+        callColor,
         saveColors
     };
 
@@ -58,6 +59,8 @@ namespace LEDCloudConfigurator
                     break;
                 case Command.saveColors:
                     break;
+                case Command.callColor:
+                    break;
                 default:
                     this.command = null;
                     return;
@@ -86,6 +89,11 @@ namespace LEDCloudConfigurator
             this.V = (byte)ColorToSend.v_b;
             this.Delay = fadingTime;
             this.setCommand(Command.fadeToHSV);
+        }
+        public CloudMessage(int ButtonID)
+        {
+            this.ButtonID = ButtonID;
+            this.setCommand(Command.callColor);
         }
 
         private void setCommand(Command command)
